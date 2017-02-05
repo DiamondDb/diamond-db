@@ -1,7 +1,3 @@
-DiamondDB
-=========
-DiamondDB is a zero dependency modular database system for Node.js. It consists of three parts: the API, the cache, and the persistence layer. The API (which I usually just call the "database") is the controller of the system: the client interacts directly with this module which in turn communicates with the cache and the persistence layer via a [standard set of messages](https://github.com/incrediblesound/DiamondDB/blob/master/src/common/operations.js). This makes it easy to switch out the cache or persistence layer with a module of your own. The cache and persistence modules can interface with any other library so long as they implement the message interface. Below is an overview of the included modules.
-
 Database
 ------------
 The DiamondDB database uses schemas that specify the character length of each field in a record. There's one schema per table, and the database validates records for incorrect keys and record size. The database currently has three basic methods: fetchRecord saveRecord and makeTable.
