@@ -4,7 +4,7 @@
   "description": "A modular database system for Node.js",
   "main": "src/main.js",
   "scripts": {
-    "test": "mocha tests/apiUtils.test.js tests/recordUtils.test.js tests/PLRUCache.test.js"
+    "test": "mocha"
   },
   "keywords": [],
   "author": "James Howe Edwards",

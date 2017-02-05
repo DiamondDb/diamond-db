@@ -1,10 +1,8 @@
-const Store = require('../persistence/store')
+const core = require('diamond-core')
 const constants = require('./constants')
-const ops = require('../common/operations')
-const schemaUtils = require('./utils/schema')
-const DummyCache = require('../cache/dummyCache')
+const DummyCache = require('./dummyCache')
 
-const { validate, schemaLength } = schemaUtils
+const { validate, schemaLength } = core.schemaUtils
 const { INIT, BUSY, READY } = constants
 const {
   success,
@@ -15,7 +13,7 @@ const {
   writeToDisk,
   initialize,
   updateMeta
-} = ops
+} = core.operations
 
 module.exports = class Database {
   constructor(options){
