@@ -27,7 +27,7 @@ module.exports = function(db){
           res.end(JSON.stringify(result))
         })
       } else {
-        req.end()
+        res.end()
       }
     })
   }

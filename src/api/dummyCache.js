@@ -1,4 +1,4 @@
-const operations = require('diamond-core').operations
+const operations = require('diamond-core').operations.internal
 
 module.exports = class DummyCache {
   message(){
