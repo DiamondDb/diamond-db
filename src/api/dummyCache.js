@@ -1,7 +1,13 @@
-const operations = require('diamond-core').operations.internal
+const diamondUtils = require('diamond-core')
+const { STORE_RECORD, FETCH_RECORD } = diamondUtils.operations.internal
 
 module.exports = class DummyCache {
-  message(){
-    return Promise.resolve(operations.success(null))
+  message(message){
+    switch(message.operation){
+      case STORE_RECORD:
+        return Promise.resolve()
+      case FETCH_RECORD:
+        return Promise.reject()
+    }
   }
 }

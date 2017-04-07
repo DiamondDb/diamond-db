@@ -5,7 +5,6 @@ const {
   PERSIST_ALL, INITIALIZE_PERSISTANCE,
   MAKE_TABLE, UPDATE_META,
   FETCH_RECORD, STORE_RECORD, FILTER_RECORDS,
-  success, failure
 } = core.operations.internal
 
 const PAGE_SIZE = 10
@@ -43,7 +42,7 @@ module.exports = class Store {
     if(this.meta && this.meta.length){
       return Promise.resolve(tableUtils.parseTableString(this.meta))
     } else {
-      return Promise.resolve(success())
+      return Promise.resolve()
     }
   }
   _clearOperations() {
@@ -86,7 +85,7 @@ module.exports = class Store {
     const recordString = page.substring(position, position+schemaLength)
     const record = recordUtils.parseRecord(recordString, table.schema)
     record._id = id
-    return Promise.resolve(success(record))
+    return Promise.resolve(record)
   }
   filter({ table, query: { key, comparator, value } }, resolve, reject){
     const numRecords = table.index-1
@@ -112,12 +111,9 @@ module.exports = class Store {
       return this._save(fileName, recordString)
     })
     if(promises.length){
-      return this.updateMeta()
-      .then(() => Promise.all(promises))
-      .then(() => success())
-      .catch(e => failure(e))
+      return this.updateMeta().then(() => Promise.all(promises))
     } else {
-      return success()
+      return Promise.resolve()
     }
   }
   message(message){

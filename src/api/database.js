@@ -27,13 +27,12 @@ module.exports = class Database {
   }
   init(options){
     return this.persist.message(initialize())
-    .then((success) => {
-      this.tables = success.data || {}  /* success message holds payload on data */
+    .then((data) => {
+      this.tables = data || {}  /* success message holds payload on data */
       this.status = READY
       this.start(options)
     })
     .catch((e) => {
-      console.log('Initialize error: ', e)
       this.status = READY
       this.start(options)
     })
@@ -75,9 +74,10 @@ module.exports = class Database {
         const id = table.index++
         this.cache.message(storeRecord(table, record, id))
         return this.persist.message(storeRecord(table, record, id))
-            .then(() => success(Object.assign({ _id: id }, record)))
-            .catch((e) => failure(e))
-        }).catch((e) => failure(e))
+          .then(() => success(Object.assign({ _id: id }, record)))
+          .catch((e) => failure(e))
+      })
+      .catch((e) => failure(e))
   }
   fetchRecord(tableName, id){
     try { this.tableExists(tableName) } catch(e) { return failure(e) }
@@ -85,18 +85,18 @@ module.exports = class Database {
     if(id < 0 || id >= table.index){
       return Promise.reject(failure(`ERROR: no record at index ${id} in table ${tableName}`))
     }
-    return this.cache.message(fetchRecord(table, id)).then((response) => {
-      if(succeeded(response.operation) && response.data){
-        return response
-      } else {
-        return this.persist.message(fetchRecord(table, id)).then(response => {
-          if(succeeded(response.operation) && response.data){
-            this.cache.message(storeRecord(table, response.data, id))
-          }
-          return response
-        })
-      }
-    })
+    return this.cache.message(fetchRecord(table, id))
+      /* resolved fetch from cache means record was available */
+      .then(record => success(record))
+      /* promise.reject() if record is not in cache */
+      .catch(() => {
+        return this.persist.message(fetchRecord(table, id))
+          .then(record => {
+            this.cache.message(storeRecord(table, record, id))
+            return success(record)
+          })
+          .catch((e) => failure(e))
+      })
   }
   filterRecords({ tableName, key, comparator, value }){
     try { this.tableExists(tableName) } catch(e) { return failure(e) }
