@@ -6,7 +6,7 @@ const { validate, schemaLength } = core.schemaUtils
 const { INIT, BUSY, READY } = constants
 const {
   success, failure,
-  fetchRecord, storeRecord, filterRecords,
+  fetchRecord, storeRecord, filterRecords, fetchFilterResult, storeFilterResult,
   makeTable, writeToDisk,
   initialize, updateMeta
 } = core.operations.internal
@@ -101,9 +101,16 @@ module.exports = class Database {
   filterRecords({ tableName, key, comparator, value }){
     try { this.tableExists(tableName) } catch(e) { return failure(e) }
     const table = this.tables[tableName]
-    return this.persist.message(filterRecords(table, key, comparator, value))
+    return this.cache.message(fetchFilterResult(tableName, key, comparator, value))
       .then(results => success(results))
-      .catch(e => failure(e))
+      .catch(() => {
+        return this.persist.message(filterRecords(table, key, comparator, value))
+        .then(results => {
+          this.cache.message(storeFilterResult(tableName, key, comparator, value, results))
+          return success(results)
+        })
+        .catch(e => failure(e))
+      })
   }
   writeToDisk(){
     this.persist.message(updateMeta(this.tables))

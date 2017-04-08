@@ -1,6 +1,3 @@
-const diamondUtils = require('diamond-core')
-const { STORE_RECORD, FETCH_RECORD } = diamondUtils.operations
-
 class Stack {
   constructor(size, lru){
     this.size = size || 8
@@ -68,35 +65,11 @@ class Lru {
     this.hash[key] = newIndex
     return item
   }
-}
-
-const makeRecordKey = (table, id) => `_${table.name}_${id}`
-
-class LruCache {
-  constructor(size){
-    this.lru = new Lru(size)
-  }
-  storeRecord({ table, record, id }){
-    const recordKey = makeRecordKey(table, id)
-    this.lru.put(recordKey, record)
-  }
-  fetchRecord({ table, id }){
-    const recordKey = makeRecordKey(table, id)
-    const record = this.lru.get(recordKey)
-    if(record === false){
-      return Promise.reject(`Record ${id} in table "${table.name}" not found.`)
-    }
-    return Promise.resolve(record)
-  }
-  message(message){
-    switch(message.operation){
-      case STORE_RECORD:
-        this.storeRecord(message.data)
-        return Promise.resolve()
-      case FETCH_RECORD:
-        return this.fetchRecord(message.data)
-    }
+  /* for testing */
+  newestItem(){
+    const idx = this.stack.data.length-1
+    return this.stack.data[idx]
   }
 }
 
-module.exports = LruCache
+module.exports = Lru

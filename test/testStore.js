@@ -7,7 +7,7 @@ const {
   FETCH_RECORD, STORE_RECORD, FILTER_RECORDS,
 } = core.operations.internal
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 5
 const makeFileName = (path, name, idx) => `${path}${name}.${idx}.dat`
 
 const parsePage = (table, page) => {
@@ -28,6 +28,33 @@ const makeFileMap = (operations, rootPath) => {
     map[fileName][id] = recordString
     return map
   }, {})
+}
+
+const testFunctions = {
+  EQ: (value, testValue) => value === testValue,
+  LT: (value, testValue) => value < testValue,
+  GT: (value, testValue) => value > testValue
+}
+
+const makeFilterFunc = (key, comparator, testValue) => {
+  const test = testFunctions[comparator]
+  return (records, result) => {
+    for(let i = 0; i < records.length; i++){
+      const record = records[i]
+      const value = record[key]
+      if(test(value, testValue)){
+        result.results.push(record)
+      }
+    }
+  }
+}
+
+const makeIndexArray = (n) => {
+  const arr = []
+  for(let i = 0; i < n; i++){
+    arr[i] = i
+  }
+  return arr
 }
 
 module.exports = class Store {
@@ -90,8 +117,8 @@ module.exports = class Store {
   filter({ table, query: { key, comparator, value } }, resolve, reject){
     const numRecords = table.index-1
     const numPages = Math.ceil(numRecords/PAGE_SIZE)
-    const indices = storageUtils.makeIndexArray(numPages)
-    let filterFunc = storageUtils.makeFilterFunc(key, comparator, value)
+    const indices = makeIndexArray(numPages)
+    let filterFunc = makeFilterFunc(key, comparator, value)
     let retries = {}, result = { results: [] }
     while(indices.length){
       const pageNumber = indices.pop()

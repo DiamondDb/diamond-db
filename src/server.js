@@ -19,7 +19,6 @@ module.exports = function(db){
   q.start()
 
   function requestHandler(req, res){
-    console.log('request...')
     res.writeHead(200, headers);
     retrieveData(req, function(data){
       if(req.url === '/query'){

@@ -4,7 +4,7 @@
   "description": "A modular database system for Node.js",
   "main": "src/main.js",
   "scripts": {
-    "test": "mocha test/main-tests.js"
+    "test": "mocha test/main-tests.js test/lru-tests.js"
   },
   "keywords": [],
   "author": "James Howe Edwards",
@@ -19,6 +19,6 @@
     "webpack": "^1.14.0"
   },
   "dependencies": {
-    "diamond-core": "^1.1.0"
+    "diamond-core": "^1.1.1"
   }
 }
